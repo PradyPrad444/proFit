@@ -1,0 +1,6 @@
+module Pods_ProFit {
+  umbrella header "Pods-ProFit-umbrella.h"
+
+  export *
+  module * { export * }
+}
