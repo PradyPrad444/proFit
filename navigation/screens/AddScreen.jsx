@@ -9,6 +9,9 @@ import {
 import { StyleSheet } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import { Image } from 'react-native';
+import captureIcon from '../../assets/capture.png';
+import returnIcon from '../../assets/return.png';
+import tickIcon from '../../assets/tick.png';
 
 const AddScreen = ({ navigation }) => {
   const { hasPermission, requestPermission } = useCameraPermission();
@@ -51,6 +54,30 @@ const AddScreen = ({ navigation }) => {
             source={{ uri: 'file://' + capturedPhoto }}
             style={{ flex: 1, resizeMode: 'contain' }}
           />
+
+          {/* The return and confirmed button for the picture preview */}
+          <View
+            style={{
+              position: 'absolute',
+              bottom: 60,
+              width: '100%',
+              flexDirection: 'row',
+              justifyContent: 'space-evenly',
+              alignItems: 'center',
+            }}
+          >
+            <TouchableOpacity
+              onPress={() => {
+                setCapturedPhoto(null);
+              }}
+            >
+              <Image source={returnIcon} style={{ height: 80, width: 80 }} />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => console.log('✅ Confirmed')}>
+              <Image source={tickIcon} style={{ height: 80, width: 80 }} />
+            </TouchableOpacity>
+          </View>
         </View>
       ) : (
         <View
@@ -69,7 +96,7 @@ const AddScreen = ({ navigation }) => {
             onPress={takePhoto}
             disabled={!cameraInitialized}
           >
-            <Text style={{ color: 'white', fontSize: 18 }}>Click</Text>
+            <Image style={{ height: 80, width: 80 }} source={captureIcon} />
           </TouchableOpacity>
         </View>
       )}
@@ -82,10 +109,11 @@ export default AddScreen;
 const styles = StyleSheet.create({
   captureBtn: {
     position: 'absolute',
-    bottom: 40,
+    bottom: 60,
     alignSelf: 'center',
-    backgroundColor: '#00000088',
-    padding: 20,
+    // backgroundColor: '#00000088',
+    paddingTop: 20,
+    paddingHorizontal: 25,
     borderRadius: 50,
   },
 });
