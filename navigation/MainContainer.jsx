@@ -5,7 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from '@react-native-vector-icons/ionicons';
 import ClosetScreen from './screens/ClosetScreen';
 import SearchScreen from './screens/SearchScreen';
-import AddScreen from './screens/AddScreen';
+import AddStack from './screens/AddStack';
 import ProfileScreen from './screens/ProfileScreen';
 import closetIcon from '../assets/wardrobe.png';
 import searchIcon from '../assets/search.png';
@@ -59,7 +59,7 @@ const MainContainer = () => {
       >
         <Tab.Screen name={closetName} component={ClosetScreen} />
         <Tab.Screen name={searchName} component={SearchScreen} />
-        <Tab.Screen name={addName} component={AddScreen} />
+        <Tab.Screen name={addName} component={AddStack} />
         <Tab.Screen name={profileName} component={ProfileScreen} />
       </Tab.Navigator>
     </NavigationContainer>

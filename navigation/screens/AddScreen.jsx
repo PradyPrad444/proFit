@@ -55,7 +55,7 @@ const AddScreen = ({ navigation }) => {
         type: 'image/png',
       });
 
-      const response = await fetch('http://10.14.167.134:8000/upload', {
+      const response = await fetch('http://10.14.188.197:8000/upload', {
         method: 'POST',
         body: data,
         headers: {
