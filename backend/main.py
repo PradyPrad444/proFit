@@ -5,8 +5,6 @@ from pymongo import MongoClient
 from config import client #used from config.py
 from rembg import remove
 import os, uuid
-import certifi
-ca = certifi.where()
 
 app = FastAPI()
 
@@ -18,7 +16,7 @@ def home():
 db = client["profit"]
 collection = db["wardrobe"]
 
-# create a new folder/directory called media if it does not exits
+# create a new folder/directory called media if it does not exit
 MEDIA_DIR = "media"
 os.makedirs(MEDIA_DIR, exist_ok=True)
 
@@ -26,7 +24,7 @@ os.makedirs(MEDIA_DIR, exist_ok=True)
 app.mount("/media", StaticFiles(directory=MEDIA_DIR), name="media")
 
 @app.post('/upload')
-async def uploadImage(file: UploadFile = File(...)):
+async def uploadImage(file: UploadFile = File(...)): #the File() it expects a multiform data to be received that must include the field name as file
     contents = await file.read()
     output = remove(contents)
     item_id = str (uuid.uuid4())
@@ -45,5 +43,3 @@ async def uploadImage(file: UploadFile = File(...)):
     collection.insert_one(doc)
 
     return JSONResponse({"id": item_id, "image_url": doc["url"]})
-
-

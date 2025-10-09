@@ -46,6 +46,31 @@ const AddScreen = ({ navigation }) => {
     }
   };
 
+  const uploadPhoto = async () => {
+    try {
+      const data = new FormData();
+      data.append('file', {
+        uri: 'file://' + capturedPhoto,
+        name: 'unprocessedPhoto.png',
+        type: 'image/png',
+      });
+
+      const response = await fetch('http://10.14.167.134:8000/upload', {
+        method: 'POST',
+        body: data,
+        headers: {
+          'content-type': 'multipart/form-data',
+        },
+      });
+
+      const json = await response.json();
+
+      navigation.navigate('ResultScreen', { imageUrl: json.image_url });
+    } catch (e) {
+      console.log('Upload didnt work', e);
+    }
+  };
+
   return (
     <SafeAreaView style={{ backgroundColor: '#171412', flex: 1 }}>
       {capturedPhoto ? (
@@ -66,6 +91,7 @@ const AddScreen = ({ navigation }) => {
               alignItems: 'center',
             }}
           >
+            {/* return button TouchableOpacity here */}
             <TouchableOpacity
               onPress={() => {
                 setCapturedPhoto(null);
@@ -74,7 +100,8 @@ const AddScreen = ({ navigation }) => {
               <Image source={returnIcon} style={{ height: 80, width: 80 }} />
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => console.log('✅ Confirmed')}>
+            {/* confirmed button TouchableOpacity here */}
+            <TouchableOpacity onPress={uploadPhoto}>
               <Image source={tickIcon} style={{ height: 80, width: 80 }} />
             </TouchableOpacity>
           </View>
@@ -91,6 +118,7 @@ const AddScreen = ({ navigation }) => {
             onInitialized={() => setCameraInitialized(true)}
             photo={true}
           />
+          {/* capture button TouchableOpacity here */}
           <TouchableOpacity
             style={styles.captureBtn}
             onPress={takePhoto}
