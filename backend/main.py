@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from pymongo import MongoClient
 from config import client #used from config.py
 from rembg import remove
+import base64
 import os, uuid
 
 app = FastAPI()
@@ -31,15 +32,18 @@ async def uploadImage(file: UploadFile = File(...)): #the File() it expects a mu
     output_path = os.path.join(MEDIA_DIR, f"{item_id}.png")
 
     with open(output_path, 'wb') as f:
-        f.write(output)
+        f.write(output) # raw binary data. Need to convert this to base64 encoded so that iPhone can read it
+
+    encoded_string = base64.b64encode(output).decode()
+    base64_image = f"data:image/png;base64,{encoded_string}"
 
 
     doc = {
         "item_id" : item_id,
         "file_path" : output_path,
-        "url" : f"http://127.0.0.1:8000/media/{item_id}.png"
+        "url" : f"http://192.168.1.212:8000/media/{item_id}.png"
     }
 
     collection.insert_one(doc)
 
-    return JSONResponse({"id": item_id, "image_url": doc["url"]})
+    return JSONResponse({"id": item_id, "image_url": base64_image})

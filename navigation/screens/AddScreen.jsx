@@ -21,6 +21,7 @@ const AddScreen = ({ navigation }) => {
   const cameraRef = React.useRef(null);
 
   const [capturedPhoto, setCapturedPhoto] = React.useState(null);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   React.useEffect(() => {
     const checkPermission = async () => {
@@ -47,6 +48,7 @@ const AddScreen = ({ navigation }) => {
   };
 
   const uploadPhoto = async () => {
+    setIsLoading(true);
     try {
       const data = new FormData();
       data.append('file', {
@@ -55,7 +57,7 @@ const AddScreen = ({ navigation }) => {
         type: 'image/png',
       });
 
-      const response = await fetch('http://10.14.188.197:8000/upload', {
+      const response = await fetch('http://192.168.1.212:8000/upload', {
         method: 'POST',
         body: data,
         headers: {
@@ -65,9 +67,12 @@ const AddScreen = ({ navigation }) => {
 
       const json = await response.json();
 
+      setIsLoading(false);
+
       navigation.navigate('ResultScreen', { imageUrl: json.image_url });
     } catch (e) {
       console.log('Upload didnt work', e);
+      setIsLoading(false);
     }
   };
 
@@ -79,6 +84,27 @@ const AddScreen = ({ navigation }) => {
             source={{ uri: 'file://' + capturedPhoto }}
             style={{ flex: 1, resizeMode: 'contain' }}
           />
+
+          {/* ADD LOADING OVERLAY */}
+          {isLoading && (
+            <View
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0,0,0,0.7)',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <ActivityIndicator size="large" color="#ffffff" />
+              <Text style={{ color: '#ffffff', marginTop: 20, fontSize: 18 }}>
+                Processing image...
+              </Text>
+            </View>
+          )}
 
           {/* The return and confirmed button for the picture preview */}
           <View
@@ -96,13 +122,30 @@ const AddScreen = ({ navigation }) => {
               onPress={() => {
                 setCapturedPhoto(null);
               }}
+              disabled={isLoading} // DISABLE WHILE UPLOADING
             >
-              <Image source={returnIcon} style={{ height: 80, width: 80 }} />
+              <Image
+                source={returnIcon}
+                style={{
+                  height: 80,
+                  width: 80,
+                  opacity: isLoading ? 0.5 : 1,
+                }}
+              />
             </TouchableOpacity>
 
             {/* confirmed button TouchableOpacity here */}
-            <TouchableOpacity onPress={uploadPhoto}>
-              <Image source={tickIcon} style={{ height: 80, width: 80 }} />
+            <TouchableOpacity onPress={uploadPhoto} disabled={isLoading}>
+              {' '}
+              {/* DISABLE WHILE UPLOADING */}
+              <Image
+                source={tickIcon}
+                style={{
+                  height: 80,
+                  width: 80,
+                  opacity: isLoading ? 0.5 : 1,
+                }}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -139,7 +182,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 60,
     alignSelf: 'center',
-    // backgroundColor: '#00000088',
     paddingTop: 20,
     paddingHorizontal: 25,
     borderRadius: 50,
