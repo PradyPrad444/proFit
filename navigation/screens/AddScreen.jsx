@@ -65,11 +65,14 @@ const AddScreen = ({ navigation }) => {
         },
       });
 
-      const json = await response.json();
+      const json = await response.json(); // receiving response from the backend
 
       setIsLoading(false);
 
-      navigation.navigate('ResultScreen', { imageUrl: json.image_url });
+      navigation.navigate('ResultScreen', {
+        imageUrl: json.image_url,
+        itemId: json.item_id,
+      }); // sending the base64 image data to the result screen
     } catch (e) {
       console.log('Upload didnt work', e);
       setIsLoading(false);

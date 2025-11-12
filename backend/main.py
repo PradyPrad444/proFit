@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import Body, FastAPI, UploadFile, File
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 from pymongo import MongoClient
@@ -15,7 +15,9 @@ def home():
 
 # choosing the client -> creating the database -> creating the collection
 db = client["profit"]
-collection = db["wardrobe"]
+wardrobeCollection = db["wardrobe"]
+processedImageCollection = db["processed_images"]
+
 
 # create a new folder/directory called media if it does not exit
 MEDIA_DIR = "media"
@@ -41,9 +43,24 @@ async def uploadImage(file: UploadFile = File(...)): #the File() it expects a mu
     doc = {
         "item_id" : item_id,
         "file_path" : output_path,
-        "url" : f"http://192.168.1.212:8000/media/{item_id}.png"
+        "url" : f"http://192.168.1.212:8000/media/{item_id}.png" # public static route to fetch image, later used in frontend
     }
 
-    collection.insert_one(doc)
+    processedImageCollection.insert_one(doc)
 
-    return JSONResponse({"id": item_id, "image_url": base64_image})
+    return JSONResponse({"item_id": item_id, "image_url": base64_image})
+
+@app.post('/wardrobe/add')
+async def uploadImage(data: dict = Body(...)):
+    item_id = data.get("item_id")
+
+    item = db["processed_images"].find_one({"item_id": item_id})
+    if not item:
+        return {"error": "Item not Found"}
+
+    db["wardrobe"].insert_one({
+        "item_id": item["item_id"],
+        "url": item["url"],
+    })
+
+    return {"message": "Item added to Wardrobe!"}
