@@ -16,16 +16,22 @@ const ResultScreen = ({ route, navigation }) => {
 
   // function to add the item into wardrobe
   const addToWardrobe = async () => {
-    await fetch('http://192.168.1.212:8000/wardrobe/add', {
+    const response = await fetch('http://192.168.1.212:8000/wardrobe/add', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ item_id: itemId }),
     });
+
+    const json = await response.json();
+
     Alert.alert('Success', 'Item added to the Wardrobe', [
       {
         text: 'OK',
         onPress: () => {
-          navigation.navigate('Closet');
+          navigation.navigate('Closet', {
+            imageUrl: json.image_url,
+            itemId: json.item_id,
+          });
         },
       },
     ]);
@@ -63,7 +69,7 @@ const ResultScreen = ({ route, navigation }) => {
             alignItems: 'center',
           }}
         >
-          {/* return button TouchableOpacity here */}
+          {/* return button here */}
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Image
               source={returnIcon}
@@ -75,7 +81,7 @@ const ResultScreen = ({ route, navigation }) => {
             />
           </TouchableOpacity>
 
-          {/* confirmed button TouchableOpacity here */}
+          {/* confirmed button here */}
           <TouchableOpacity onPress={addToWardrobe}>
             {' '}
             {/* DISABLE WHILE UPLOADING */}

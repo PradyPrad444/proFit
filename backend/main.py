@@ -64,3 +64,9 @@ async def uploadImage(data: dict = Body(...)):
     })
 
     return {"message": "Item added to Wardrobe!"}
+
+@app.get('/wardrobe')
+async def get_wardrobe():
+    # find all items in wardrobe collection
+    items = list(wardrobeCollection.find({}, {"_id": 0}))  # exclude _id as not needed in the frontend
+    return {"items": items}
