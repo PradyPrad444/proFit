@@ -70,3 +70,29 @@ async def get_wardrobe():
     # find all items in wardrobe collection
     items = list(wardrobeCollection.find({}, {"_id": 0}))  # exclude _id as not needed in the frontend
     return {"items": items}
+
+
+@app.post("/generate_outfits")
+async def generate_outfits():
+    # getting all the items in the wardrobe collection and we are excluding the id's of those items
+    items = list(wardrobeCollection.find({}, {'_id': 0}))
+
+    prompt = f"""
+    You are a fashion stylist and you job is to generate and suggest the outfit given these wardrobe
+    items (as image urls), create an outfit combination that look stylish and season-appropriate. 
+    Items: {items}
+    Respond in JSON as: 
+    [
+      {{"outfit_name": "...", "items": ["item_d1", "item_id2"], "description": "..."}}  
+    ]
+    """
+
+    # doing a post request to Ollama 
+    import requests, json
+    r = requests.post(
+        "http://localhost:11434/api/generate",
+        json = {"model": "mistral", "prompt": prompt}
+    )
+
+    text = r.text
+    return json.loads(text) #converts the JSON formatted string to a python list or dict and then we return it to the front

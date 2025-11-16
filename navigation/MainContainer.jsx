@@ -11,9 +11,10 @@ import closetIcon from '../assets/wardrobe.png';
 import searchIcon from '../assets/search.png';
 import addIcon from '../assets/add.png';
 import profileIcon from '../assets/user.png';
+import GenerateScreen from './screens/SearchScreen';
 
 const closetName = 'Closet';
-const searchName = 'Search';
+const generateScreen = 'Generate';
 const addName = 'Add';
 const profileName = 'Profile';
 
@@ -31,7 +32,7 @@ const MainContainer = () => {
 
             if (rn === closetName) {
               iconName = closetIcon;
-            } else if (rn === searchName) {
+            } else if (rn === generateScreen) {
               iconName = searchIcon;
             } else if (rn === addName) {
               iconName = addIcon;
@@ -58,7 +59,7 @@ const MainContainer = () => {
         })}
       >
         <Tab.Screen name={closetName} component={ClosetScreen} />
-        <Tab.Screen name={searchName} component={SearchScreen} />
+        <Tab.Screen name={generateScreen} component={GenerateScreen} />
         <Tab.Screen name={addName} component={AddStack} />
         <Tab.Screen name={profileName} component={ProfileScreen} />
       </Tab.Navigator>
