@@ -4,10 +4,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 const GenerateScreen = ({ navigation }) => {
   const [outfits, setOutfits] = React.useState([]);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
 
   const generateOutfit = async () => {
-    setIsLoading(true);
+    setLoading(true);
     try {
       const response = await fetch(
         'http://192.168.1.212:8000/generate_outfits',
@@ -19,40 +19,44 @@ const GenerateScreen = ({ navigation }) => {
       const json = await response.json();
       setOutfits(json);
     } catch (err) {
-      console.log(err);
+      console.log('Error generating outfits:', err);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <SafeAreaView style={{ backgroundColor: '#171412' }}>
-      <View
-        style={{ backgroundColor: '#171412', width: '100%', height: '100%' }}
-      >
-        <Text
-          onPress={() => navigation.navigate('Search')}
-          style={{ color: 'white' }}
-        >
-          This is where you generate outfits!
-        </Text>
-
-        <TouchableOpacity>
-          <Text
-            style={{ color: 'white', marginTop: 100, fontSize: 21 }}
-            onPress={generateOutfit}
-          >
-            Generate Outfit
-          </Text>
+    <SafeAreaView style={{ backgroundColor: '#171412', flex: 1 }}>
+      <View style={{ padding: 20 }}>
+        <TouchableOpacity onPress={generateOutfit}>
+          <Text style={{ color: 'white', fontSize: 21 }}>Generate Outfit</Text>
         </TouchableOpacity>
 
-        {isLoading && (
+        {loading && (
           <Text style={{ color: '#fff', marginTop: 20 }}>
             Generating outfits...
           </Text>
         )}
 
-        {/* need to check if its working or not */}
+        {outfits.length > 0 && (
+          <View style={{ marginTop: 50 }}>
+            {outfits.map((outfit, index) => (
+              <View key={index} style={{ marginBottom: 30 }}>
+                <Text
+                  style={{ color: '#fff', fontSize: 18, fontWeight: 'bold' }}
+                >
+                  {outfit.outfit_name}
+                </Text>
+                <Text style={{ color: '#ccc', marginBottom: 10 }}>
+                  {outfit.description}
+                </Text>
+                <Text style={{ color: '#aaa' }}>
+                  Items: {outfit.items.join(', ')}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );

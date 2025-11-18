@@ -74,25 +74,60 @@ async def get_wardrobe():
 
 @app.post("/generate_outfits")
 async def generate_outfits():
-    # getting all the items in the wardrobe collection and we are excluding the id's of those items
     items = list(wardrobeCollection.find({}, {'_id': 0}))
 
     prompt = f"""
-    You are a fashion stylist and you job is to generate and suggest the outfit given these wardrobe
-    items (as image urls), create an outfit combination that look stylish and season-appropriate. 
-    Items: {items}
-    Respond in JSON as: 
-    [
-      {{"outfit_name": "...", "items": ["item_d1", "item_id2"], "description": "..."}}  
-    ]
+    SYSTEM INSTRUCTION:
+    You are a data-driven fashion pairing engine.
+    You are NOT creative. You must only use data provided to you.
+
+    RULES:
+    - You will receive a JSON array of available wardrobe items.
+    - Each item has "item_id" and "url".
+    - You MUST only use these item_ids in your response.
+    - Do NOT invent, modify, or duplicate item_ids.
+    - If there are fewer than 3 items, reuse existing ones.
+    - Output exactly one JSON array of outfits.
+    - Each outfit object must have:
+    - "outfit_name"
+    - "description"
+    - "items": list of existing item_ids only.
+
+    Wardrobe items:
+    {items}
+
+    Return STRICTLY valid JSON, nothing else. No text before or after.
     """
 
-    # doing a post request to Ollama 
+
+
     import requests, json
+
+    # Stream the Ollama response
     r = requests.post(
         "http://localhost:11434/api/generate",
-        json = {"model": "mistral", "prompt": prompt}
+        json={"model": "mistral", "prompt": prompt},
+        stream=True
     )
 
-    text = r.text
-    return json.loads(text) #converts the JSON formatted string to a python list or dict and then we return it to the front
+    # Collect all "response" chunks
+    response_text = ""
+    for line in r.iter_lines():
+        if line:
+            data = json.loads(line.decode("utf-8"))
+            if "response" in data:
+                response_text += data["response"]
+
+    print(" Raw Mistral output:", response_text[:500])
+
+    # Try to parse the model's JSON output
+    try:
+        start = response_text.find("[")
+        end = response_text.rfind("]") + 1
+        cleaned = response_text[start:end]
+        result = json.loads(cleaned)
+    except Exception as e:
+        print("Parsing error:", e)
+        result = {"error": "Invalid JSON", "raw": response_text}
+
+    return JSONResponse(content=result)
