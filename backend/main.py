@@ -6,6 +6,39 @@ from config import client #used from config.py
 from rembg import remove
 import base64
 import os, uuid
+from transformers import CLIPProcessor, CLIPModel
+from PIL import Image
+import torch
+
+clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+
+CLOTHING_LABELS = [
+    "white t-shirt", "black t-shirt", "pink t-shirt",
+    "blue jeans", "black jeans", "grey jeans",
+    "hoodie", "sweatshirt", "jacket", "shirt"
+]
+
+# clip backend code to analyse images
+def classify_image_clip(image_path):
+    image = Image.open(image_path)
+
+    inputs = clip_processor(
+        text = CLOTHING_LABELS,
+        images = image,
+        return_tensors = "pt",
+        padding = True
+    )
+
+    outputs = clip_model (**inputs)
+
+    probability = outputs.logits_per_image.softmax(dim=1)
+
+    best_index = probability.argmax().item()
+    best_label = CLOTHING_LABELS[best_index]
+
+    return best_label
+
 
 app = FastAPI()
 
@@ -17,7 +50,6 @@ def home():
 db = client["profit"]
 wardrobeCollection = db["wardrobe"]
 processedImageCollection = db["processed_images"]
-
 
 # create a new folder/directory called media if it does not exit
 MEDIA_DIR = "media"
@@ -36,6 +68,8 @@ async def uploadImage(file: UploadFile = File(...)): #the File() it expects a mu
     with open(output_path, 'wb') as f:
         f.write(output) # raw binary data. Need to convert this to base64 encoded so that iPhone can read it
 
+    label = classify_image_clip(output_path)
+
     encoded_string = base64.b64encode(output).decode()
     base64_image = f"data:image/png;base64,{encoded_string}"
 
@@ -43,12 +77,13 @@ async def uploadImage(file: UploadFile = File(...)): #the File() it expects a mu
     doc = {
         "item_id" : item_id,
         "file_path" : output_path,
-        "url" : f"http://192.168.1.212:8000/media/{item_id}.png" # public static route to fetch image, later used in frontend
+        "url" : f"http://192.168.1.212:8000/media/{item_id}.png", # public static route to fetch image, later used in frontend
+        "label" : label   
     }
 
     processedImageCollection.insert_one(doc)
 
-    return JSONResponse({"item_id": item_id, "image_url": base64_image})
+    return JSONResponse({"item_id": item_id, "image_url": base64_image, "label" : label})
 
 @app.post('/wardrobe/add')
 async def uploadImage(data: dict = Body(...)):
@@ -61,6 +96,7 @@ async def uploadImage(data: dict = Body(...)):
     db["wardrobe"].insert_one({
         "item_id": item["item_id"],
         "url": item["url"],
+        "label" : item["label"]
     })
 
     return {"message": "Item added to Wardrobe!"}
@@ -74,33 +110,35 @@ async def get_wardrobe():
 
 @app.post("/generate_outfits")
 async def generate_outfits():
-    items = list(wardrobeCollection.find({}, {'_id': 0}))
+    items = list(wardrobeCollection.find({}, {'_id': 0, 'item_id': 1, 'label' : 1}))
+
+    readable_items = "\n".join(
+        [f"- {item['item_id']}: {item['label']}" for item in items]
+    )
 
     prompt = f"""
-    SYSTEM INSTRUCTION:
-    You are a data-driven fashion pairing engine.
-    You are NOT creative. You must only use data provided to you.
+    You are a fashion stylist. You will create outfit combinations using ONLY the items listed below.
+    Each item has an ID and a label (generated using CLIP). DO NOT invent items. DO NOT use clothing that is not in the list.
 
-    RULES:
-    - You will receive a JSON array of available wardrobe items.
-    - Each item has "item_id" and "url".
-    - You MUST only use these item_ids in your response.
-    - Do NOT invent, modify, or duplicate item_ids.
-    - If there are fewer than 3 items, reuse existing ones.
-    - Output exactly one JSON array of outfits.
-    - Each outfit object must have:
-    - "outfit_name"
-    - "description"
-    - "items": list of existing item_ids only.
+    Wardrobe Items:
+    {readable_items}
 
-    Wardrobe items:
-    {items}
+    Rules:
+    - ONLY use the exact items from the list.
+    - Suggest 1 good outfit.
+    - An outfit MUST have at least 2 items.
+    - Outfits must be realistic and fashion-coordinated.
+    - Output MUST be valid JSON ONLY. No commentary outside JSON.
 
-    Return STRICTLY valid JSON, nothing else. No text before or after.
-    """
-
-
-
+    Output Format (strict):
+    [
+    {{
+        "outfit_name": "string",
+        "description": "string",
+        "items": ["item_id1", "item_id2"]
+    }}
+    ]
+"""
     import requests, json
 
     # Stream the Ollama response
@@ -131,3 +169,5 @@ async def generate_outfits():
         result = {"error": "Invalid JSON", "raw": response_text}
 
     return JSONResponse(content=result)
+
+
