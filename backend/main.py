@@ -16,7 +16,7 @@ clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
 CLOTHING_LABELS = [
     "white t-shirt", "black t-shirt", "pink t-shirt",
     "blue jeans", "black jeans", "grey jeans",
-    "hoodie", "sweatshirt", "jacket", "shirt"
+    "hoodie", "sweatshirt", "jacket", "shirt", "white shirt"
 ]
 
 # clip backend code to analyse images
@@ -110,10 +110,20 @@ async def get_wardrobe():
 
 @app.post("/generate_outfits")
 async def generate_outfits():
-    items = list(wardrobeCollection.find({}, {'_id': 0, 'item_id': 1, 'label' : 1}))
+    # fetching all the approved wardrobe section
+    wardrobe_items = list(wardrobeCollection.find({}, {'_id': 0, 'item_id': 1, 'label' : 1, 'url' : 1}))
 
+    # if empty, just throw an error
+    if not wardrobe_items:
+        return JSONResponse(content={"error": "Wardrobe is empty. Add items first."}, status_code=400)
+    
+    id_to_url = {item["item_id"]: item.get("url") for item in wardrobe_items}
+    id_to_label = {item["item_id"]: item.get("label", "unknown") for item in wardrobe_items}
+    valid_ids = set(id_to_url.keys())
+
+    # 3) Create prompt for Mistral (only IDs + labels)
     readable_items = "\n".join(
-        [f"- {item['item_id']}: {item['label']}" for item in items]
+        [f"- {item['item_id']}: {item['label']}" for item in wardrobe_items]
     )
 
     prompt = f"""
@@ -168,6 +178,15 @@ async def generate_outfits():
         print("Parsing error:", e)
         result = {"error": "Invalid JSON", "raw": response_text}
 
+
+    for outfit in result:
+        # keep only IDs that exist in wardrobe
+        outfit_ids = [i for i in outfit.get("items", []) if i in valid_ids]
+        outfit["items"] = outfit_ids
+
+        # add urls + labels for rendering
+        outfit["image_urls"] = [id_to_url[i] for i in outfit_ids if id_to_url.get(i)]
+        outfit["item_labels"] = [id_to_label[i] for i in outfit_ids]
     return JSONResponse(content=result)
 
 
