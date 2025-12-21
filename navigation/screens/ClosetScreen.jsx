@@ -53,20 +53,27 @@ const ClosetScreen = () => {
     );
   }
 
-  const renderItem = ({ item }) => (
-    <View style={styles.imageWrapper}>
-      <Image source={{ uri: item.url }} style={styles.image} />
-    </View>
-  );
 
   return (
     <SafeAreaView style={styles.container}>
+    <Text style={{fontSize: 35, color: 'white', alignSelf: 'flex-start', marginLeft: 10, marginBottom: 12, fontWeight: 'bold'}}>Closet</Text>
       <FlatList
         data={wardrobeItems}
         keyExtractor={item => item.item_id}
-        renderItem={renderItem}
         numColumns={2} //  2-column grid
-        contentContainerStyle={{ paddingBottom: 50 }}
+        renderItem={({item}) => {
+          return (
+            <View style = {styles.outerContainer}>
+              <View style = {styles.photoContainer} >
+                <Image source={{uri: item.url}} style={styles.image} />
+              </View>
+              
+              <View style = {styles.itemTypeContainer}>
+                <Text style={{color: 'white', fontSize: 16, fontFamily: 'Geist-Bold'}}>{item.label}</Text>
+              </View>
+            </View>
+          )
+        }}
       />
     </SafeAreaView>
   );
@@ -78,23 +85,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#171412',
-  },
-  imageWrapper: {
-    flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    borderColor: '#6d6b69ff',
-    borderWidth: 2,
-    marginHorizontal: '5%',
-    marginBottom: '20',
-    height: 200,
-    width: 100,
-    backgroundColor: '#2d2c2bff',
-    borderRadius: 18,
+    alignItems: 'center'
+  },
+  outerContainer: {
+    height: 220,
+    width: 185,
+    backgroundColor: "#e0dfdeff",
+    marginTop: 10,
+    marginBottom: 30,
+    marginHorizontal: 10,
+    borderRadius: 20,
+  },
+  photoContainer: {
+    marginBottom: 20
   },
   image: {
-    height: '500',
-    width: '200',
-    marginBottom: 90,
-  },
+    height: "100%",
+    width: "100%",
+  }, 
+  itemTypeContainer: {
+    marginTop: 10,
+    marginHorizontal: 10,
+  }
 });

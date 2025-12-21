@@ -8,6 +8,7 @@ import base64
 import os, uuid
 from transformers import CLIPProcessor, CLIPModel
 from PIL import Image
+import io
 import torch
 
 clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")

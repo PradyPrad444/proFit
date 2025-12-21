@@ -9,6 +9,7 @@ import AddStack from './screens/AddStack';
 import ProfileScreen from './screens/ProfileScreen';
 import closetIcon from '../assets/wardrobe.png';
 import searchIcon from '../assets/search.png';
+import generateIcon from "../assets/generate.png";
 import addIcon from '../assets/add.png';
 import profileIcon from '../assets/user.png';
 import GenerateScreen from './screens/SearchScreen';
@@ -33,7 +34,7 @@ const MainContainer = () => {
             if (rn === closetName) {
               iconName = closetIcon;
             } else if (rn === generateScreen) {
-              iconName = searchIcon;
+              iconName = generateIcon;
             } else if (rn === addName) {
               iconName = addIcon;
             } else if (rn === profileName) {
