@@ -12,6 +12,7 @@ import { Image } from 'react-native';
 import captureIcon from '../../assets/capture.png';
 import returnIcon from '../../assets/return.png';
 import tickIcon from '../../assets/tick.png';
+import { Alert } from 'react-native';
 
 const AddScreen = ({ navigation }) => {
   const { hasPermission, requestPermission } = useCameraPermission();
@@ -47,8 +48,30 @@ const AddScreen = ({ navigation }) => {
     }
   };
 
+  const addToWardrobe = async itemId => {
+    const response = await fetch('http://192.168.1.212:8000/wardrobe/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ item_id: itemId }),
+    });
+
+    const json = await response.json();
+
+    Alert.alert('Success', 'Item added to the Wardrobe', [
+      {
+        text: 'OK',
+        onPress: () => {
+          setCapturedPhoto(false);
+          setIsLoading(false);
+          navigation.navigate('Closet');
+        },
+      },
+    ]);
+  };
+
   const uploadPhoto = async () => {
     setIsLoading(true);
+
     try {
       const data = new FormData();
       data.append('file', {
@@ -66,13 +89,8 @@ const AddScreen = ({ navigation }) => {
       });
 
       const json = await response.json(); // receiving response from the backend
-
+      await addToWardrobe(json.item_id);
       setIsLoading(false);
-
-      navigation.navigate('ResultScreen', {
-        imageUrl: json.image_url,
-        itemId: json.item_id,
-      }); // sending the base64 image data to the result screen
     } catch (e) {
       console.log('Upload didnt work', e);
       setIsLoading(false);
@@ -120,35 +138,26 @@ const AddScreen = ({ navigation }) => {
               alignItems: 'center',
             }}
           >
-            {/* return button TouchableOpacity here */}
             <TouchableOpacity
+              style={[styles.primaryBtn, isLoading && { opacity: 0.7 }]}
               onPress={() => {
                 setCapturedPhoto(null);
               }}
-              disabled={isLoading} // DISABLE WHILE UPLOADING
+              activeOpacity={0.85}
+              disabled={isLoading}
             >
-              <Image
-                source={returnIcon}
-                style={{
-                  height: 80,
-                  width: 80,
-                  opacity: isLoading ? 0.5 : 1,
-                }}
-              />
+              <Text style={styles.primaryBtnText}>Retake</Text>
             </TouchableOpacity>
 
-            {/* confirmed button TouchableOpacity here */}
-            <TouchableOpacity onPress={uploadPhoto} disabled={isLoading}>
-              {' '}
-              {/* DISABLE WHILE UPLOADING */}
-              <Image
-                source={tickIcon}
-                style={{
-                  height: 80,
-                  width: 80,
-                  opacity: isLoading ? 0.5 : 1,
-                }}
-              />
+            {/* confirmed button here */}
+
+            <TouchableOpacity
+              style={[styles.primaryBtn, isLoading && { opacity: 0.7 }]}
+              onPress={uploadPhoto}
+              activeOpacity={0.85}
+              disabled={isLoading}
+            >
+              <Text style={styles.primaryBtnText}>Move Ahead</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -188,5 +197,28 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingHorizontal: 25,
     borderRadius: 50,
+  },
+  primaryBtn: {
+    height: 56,
+    width: '42%',
+    borderRadius: 16,
+    backgroundColor: '#ED7A29',
+    alignItems: 'center',
+    justifyContent: 'center',
+    // floating effect
+    shadowColor: '#ec6313ff',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 10, // Android
+  },
+  primaryBtnIcon: {
+    fontSize: 18,
+    color: 'white',
+  },
+  primaryBtnText: {
+    color: 'black',
+    fontSize: 22,
+    fontWeight: '600',
   },
 });

@@ -15,7 +15,7 @@ const ResultScreen = ({ route, navigation }) => {
   const { imageUrl, itemId } = route.params; // saving the base64 image data to imageUrl
 
   // function to add the item into wardrobe
-  const addToWardrobe = async () => {
+  const addToWardrobe = async itemId => {
     const response = await fetch('http://192.168.1.212:8000/wardrobe/add', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -28,10 +28,7 @@ const ResultScreen = ({ route, navigation }) => {
       {
         text: 'OK',
         onPress: () => {
-          navigation.navigate('Closet', {
-            imageUrl: json.image_url,
-            itemId: json.item_id,
-          });
+          navigation.navigate('Closet');
         },
       },
     ]);

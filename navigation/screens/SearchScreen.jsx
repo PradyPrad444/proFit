@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+// took from chat gpt
 const SUGGESTIONS = [
   { label: 'Rainy Day', icon: '☔️' },
   { label: 'Office Casual', icon: '💼' },
@@ -22,6 +23,7 @@ const GenerateScreen = ({ navigation }) => {
   const [outfits, setOutfits] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
   const [prompt, setPrompt] = React.useState('');
+  const [newGenButton, setNewGenButton] = React.useState(false);
 
   const generateOutfit = async () => {
     setLoading(true);
@@ -43,6 +45,11 @@ const GenerateScreen = ({ navigation }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGenerate = () => {
+    generateOutfit();
+    setNewGenButton(true);
   };
 
   const applySuggestion = text => {
@@ -112,7 +119,7 @@ const GenerateScreen = ({ navigation }) => {
                   activeOpacity={0.8}
                   onPress={() => applySuggestion(s.label)}
                 >
-                  <Text style={styles.chipIcon}>{s.icon}</Text>
+                  {/* <Text style={styles.chipIcon}>{s.icon}</Text> */}
                   <Text style={styles.chipText}>{s.label}</Text>
                 </TouchableOpacity>
               ))}
@@ -124,9 +131,6 @@ const GenerateScreen = ({ navigation }) => {
             <View style={{ marginTop: 10 }}>
               {outfits.map((outfit, index) => (
                 <View key={index} style={styles.outfitCard}>
-                  {/* <Text style={styles.outfitName}>{outfit.outfit_name}</Text>
-                  <Text style={styles.outfitDesc}>{outfit.description}</Text> */}
-
                   {/* ITEMS */}
                   <View style={styles.itemsRow}>
                     {outfit.image_urls?.map((url, i) => (
@@ -143,21 +147,20 @@ const GenerateScreen = ({ navigation }) => {
             </View>
           )}
 
-          {/* Spacer so content isn't hidden behind bottom button */}
           <View style={{ height: 120 }} />
         </ScrollView>
 
-        {/* STICKY BOTTOM BUTTON */}
-        <View style={styles.bottomDock}>
-          <TouchableOpacity
-            style={[styles.primaryBtn, loading && { opacity: 0.7 }]}
-            onPress={generateOutfit}
-            activeOpacity={0.85}
-            disabled={loading}
-          >
-            <Text style={styles.primaryBtnText}>Generate Outfit</Text>
-          </TouchableOpacity>
-        </View>
+        {/* Floating BUTTON */}
+        <TouchableOpacity
+          style={[styles.primaryBtn, loading && { opacity: 0.7 }]}
+          onPress={handleGenerate}
+          activeOpacity={0.85}
+          disabled={loading}
+        >
+          <Text style={styles.primaryBtnText}>
+            {newGenButton ? 'Generate a new Outfit' : 'Generate Outfit'}
+          </Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -168,7 +171,7 @@ export default GenerateScreen;
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#171412', // background-dark
+    backgroundColor: '#171412',
   },
 
   header: {
@@ -177,7 +180,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'rgba(25,16,34,0.90)',
+    backgroundColor: '#171412',
   },
   headerBtn: {
     width: 40,
@@ -195,7 +198,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 35,
     fontWeight: '700',
-    letterSpacing: -0.2,
   },
 
   scrollContent: {
@@ -213,8 +215,8 @@ const styles = StyleSheet.create({
     height: 96,
     borderRadius: 48,
     borderWidth: 1,
-    borderColor: 'rgba(127,19,236,0.25)',
-    backgroundColor: 'rgba(127,19,236,0.08)',
+    borderColor: '382E29',
+    backgroundColor: '#171412',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
@@ -223,13 +225,13 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: 'rgba(127,19,236,0.12)',
+    backgroundColor: '#382E29',
     alignItems: 'center',
     justifyContent: 'center',
   },
   orbIcon: {
     fontSize: 30,
-    color: '#7f13ec',
+    color: '#382E29',
   },
   bigTitle: {
     color: 'white',
@@ -258,14 +260,14 @@ const styles = StyleSheet.create({
     top: 6,
     height: 180,
     borderRadius: 18,
-    backgroundColor: 'rgba(127,19,236,0.20)',
+    // backgroundColor: 'rgba(127,19,236,0.20)',
     opacity: 0.25,
   },
   textAreaCard: {
     borderRadius: 16,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.10)',
-    backgroundColor: '#231b2e', // surface-dark
+    backgroundColor: '#171412',
     padding: 14,
     minHeight: 160,
   },
@@ -309,7 +311,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.12)',
-    backgroundColor: '#231b2e',
+    backgroundColor: '#382E29',
     paddingHorizontal: 14,
     paddingVertical: 10,
     gap: 8,
@@ -365,25 +367,34 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 14,
     paddingBottom: 22,
-    backgroundColor: 'rgba(25,16,34,0.96)',
+    backgroundColor: '#171412',
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.06)',
+    // borderTopColor: 'rgba(255,255,255,0.06)',
   },
   primaryBtn: {
+    position: 'absolute',
+    bottom: 30,
+    left: 20,
+    right: 20,
     height: 56,
-    borderRadius: 14,
-    backgroundColor: '#7f13ec',
-    flexDirection: 'row',
+    borderRadius: 16,
+    backgroundColor: '#ED7A29',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
+    marginHorizontal: '20',
+    // floating effect
+    shadowColor: '#ec6313ff',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 10, // Android
   },
   primaryBtnIcon: {
     fontSize: 18,
     color: 'white',
   },
   primaryBtnText: {
-    color: 'white',
+    color: 'black',
     fontSize: 22,
     fontWeight: '600',
   },

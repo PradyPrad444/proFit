@@ -576,7 +576,9 @@
     "ios": {},
     "android": {}
   },
-  "assets": [],
+  "assets": [
+    "./assets/fonts"
+  ],
   "project": {
     "ios": {
       "sourceDir": "/Users/prady/Desktop/Coding/ProFit/ProFit/ios",
@@ -585,6 +587,7 @@
         "path": ".",
         "isWorkspace": true
       },
+      "automaticPodsInstallation": true,
       "assets": []
     },
     "android": {

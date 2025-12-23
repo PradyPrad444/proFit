@@ -6,6 +6,7 @@ import {
   FlatList,
   ActivityIndicator,
   StyleSheet,
+  Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
@@ -53,26 +54,50 @@ const ClosetScreen = () => {
     );
   }
 
-
   return (
     <SafeAreaView style={styles.container}>
-    <Text style={{fontSize: 35, color: 'white', alignSelf: 'flex-start', marginLeft: 10, marginBottom: 12, fontWeight: 'bold'}}>Closet</Text>
+      <Text
+        style={{
+          fontSize: 35,
+          color: 'white',
+          alignSelf: 'flex-start',
+          marginLeft: 10,
+          marginBottom: 12,
+          fontWeight: 'bold',
+        }}
+      >
+        Your Closet
+      </Text>
       <FlatList
         data={wardrobeItems}
         keyExtractor={item => item.item_id}
         numColumns={2} //  2-column grid
-        renderItem={({item}) => {
+        renderItem={({ item }) => {
           return (
-            <View style = {styles.outerContainer}>
-              <View style = {styles.photoContainer} >
-                <Image source={{uri: item.url}} style={styles.image} />
+            <Pressable
+              onLongPress={() => {
+                console.warn('Long Press');
+              }}
+            >
+              <View style={styles.outerContainer}>
+                <View style={styles.photoContainer}>
+                  <Image source={{ uri: item.url }} style={styles.image} />
+                </View>
+
+                <View style={styles.itemTypeContainer}>
+                  <Text
+                    style={{
+                      color: 'white',
+                      fontSize: 18,
+                      fontFamily: 'Geist-Bold',
+                    }}
+                  >
+                    {item.label}
+                  </Text>
+                </View>
               </View>
-              
-              <View style = {styles.itemTypeContainer}>
-                <Text style={{color: 'white', fontSize: 16, fontFamily: 'Geist-Bold'}}>{item.label}</Text>
-              </View>
-            </View>
-          )
+            </Pressable>
+          );
         }}
       />
     </SafeAreaView>
@@ -86,26 +111,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#171412',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   outerContainer: {
     height: 220,
     width: 185,
-    backgroundColor: "#e0dfdeff",
+    backgroundColor: '#e0dfdeff',
     marginTop: 10,
-    marginBottom: 30,
+    marginBottom: 50,
     marginHorizontal: 10,
     borderRadius: 20,
   },
   photoContainer: {
-    marginBottom: 20
+    marginBottom: 20,
   },
   image: {
-    height: "100%",
-    width: "100%",
-  }, 
+    height: '100%',
+    width: '100%',
+  },
   itemTypeContainer: {
     marginTop: 10,
     marginHorizontal: 10,
-  }
+  },
 });
