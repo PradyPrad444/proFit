@@ -157,7 +157,7 @@ const AddScreen = ({ navigation }) => {
               activeOpacity={0.85}
               disabled={isLoading}
             >
-              <Text style={styles.primaryBtnText}>Move Ahead</Text>
+              <Text style={styles.primaryBtnText}>Save to Closet</Text>
             </TouchableOpacity>
           </View>
         </View>

@@ -3,6 +3,7 @@ import {
   View,
   Text,
   Image,
+  Alert,
   FlatList,
   ActivityIndicator,
   StyleSheet,
@@ -10,6 +11,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
+import WardrobeRow from '../../components/WardrobeRowAction';
+
+const BASE_URL = 'http://192.168.1.212:8000';
 
 const ClosetScreen = () => {
   const [wardrobeItems, setWardrobeItems] = React.useState([]);
@@ -33,6 +37,40 @@ const ClosetScreen = () => {
 
       fetchWardrobe();
     }, []),
+  );
+
+  const handleRemove = React.useCallback(async itemToRemove => {
+    try {
+      // make sure you add this DELETE route in backend
+      await fetch(`${BASE_URL}/wardrobe/${itemToRemove.item_id}`, {
+        method: 'DELETE',
+      });
+
+      setWardrobeItems(prev =>
+        prev.filter(x => x.item_id !== itemToRemove.item_id),
+      );
+    } catch (e) {
+      console.log('Delete error:', e);
+      Alert.alert('Error', 'Could not remove item. Please try again.');
+    }
+  }, []);
+
+  const confirmRemove = React.useCallback(
+    item => {
+      Alert.alert(
+        'Remove this item?',
+        `Remove "${item.label}" from your closet?`,
+        [
+          { text: 'Cancel' },
+          {
+            text: 'Remove',
+            style: 'destructive',
+            onPress: () => handleRemove(item),
+          },
+        ],
+      );
+    },
+    [handleRemove],
   );
 
   if (loading) {
@@ -71,12 +109,13 @@ const ClosetScreen = () => {
       <FlatList
         data={wardrobeItems}
         keyExtractor={item => item.item_id}
-        numColumns={2} //  2-column grid
+        numColumns={2}
         renderItem={({ item }) => {
           return (
-            <Pressable
-              onLongPress={() => {
-                console.warn('Long Press');
+            <WardrobeRow
+              item={item}
+              onRemove={() => {
+                confirmRemove(item);
               }}
             >
               <View style={styles.outerContainer}>
@@ -96,7 +135,7 @@ const ClosetScreen = () => {
                   </Text>
                 </View>
               </View>
-            </Pressable>
+            </WardrobeRow>
           );
         }}
       />

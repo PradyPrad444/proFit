@@ -190,4 +190,8 @@ async def generate_outfits():
         outfit["item_labels"] = [id_to_label[i] for i in outfit_ids]
     return JSONResponse(content=result)
 
+@app.delete("/wardrobe/{item_id}")
+async def delete_item(item_id: str):
+    result = wardrobeCollection.delete_one({"item_id": item_id})
+    return {"deleted": result.deleted_count}
 
