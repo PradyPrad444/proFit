@@ -21,13 +21,24 @@ const WardrobeRow = ({ item, onRemove, children }) => {
         customStyles={{
           optionsContainer: {
             borderRadius: 12,
-            paddingVertical: 6,
+            paddingVertical: 4,
+            width: 180,
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingHorizontal: 2,
           },
         }}
       >
         {/* each option in the pop up menu */}
         <MenuOption onSelect={() => onRemove(item)}>
-          <Text style={{ padding: 12 }}>Remove from closet</Text>
+          <Text
+            style={{
+              fontWeight: '600',
+              fontSize: '14',
+            }}
+          >
+            Remove from closet
+          </Text>
         </MenuOption>
       </MenuOptions>
     </Menu>
