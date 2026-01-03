@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { View, StatusBar } from 'react-native';
+import MainTabs from './navigation/MainTabs';
 import MainContainer from './navigation/MainContainer';
 import { MenuProvider } from 'react-native-popup-menu';
 

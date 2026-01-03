@@ -1,0 +1,71 @@
+import * as React from 'react';
+import { View, Text, Image } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Ionicons from '@react-native-vector-icons/ionicons';
+import ClosetScreen from './screens/ClosetScreen';
+import SearchScreen from './screens/SearchScreen';
+import AddStack from './screens/AddStack';
+import ProfileScreen from './screens/ProfileScreen';
+import closetIcon from '../assets/wardrobe.png';
+import searchIcon from '../assets/search.png';
+import generateIcon from '../assets/generate.png';
+import addIcon from '../assets/add.png';
+import profileIcon from '../assets/user.png';
+import GenerateScreen from './screens/SearchScreen';
+import LogInScreen from './screens/LogInEmailScreen';
+
+const closetName = 'Closet';
+const generateScreen = 'Generate';
+const addName = 'Add';
+const profileName = 'Profile';
+const logInName = 'LogIn';
+
+const Tab = createBottomTabNavigator();
+
+const MainTabs = () => {
+  return (
+    <Tab.Navigator
+      initialRouteName={closetName}
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+          let rn = route.name;
+
+          if (rn === closetName) {
+            iconName = closetIcon;
+          } else if (rn === generateScreen) {
+            iconName = generateIcon;
+          } else if (rn === addName) {
+            iconName = addIcon;
+          } else if (rn === profileName) {
+            iconName = profileIcon;
+          }
+
+          return (
+            <Image
+              source={iconName}
+              style={{ tintColor: color, width: size, height: size }}
+            />
+          );
+        },
+        headerShown: false,
+        tabBarShowLabel: false,
+        tabBarActiveTintColor: 'white',
+        tabBarInactiveTintColor: 'gray',
+        tabBarStyle: {
+          backgroundColor: '#26211C',
+          paddingTop: 5,
+          outlineColor: '#171412',
+        },
+      })}
+    >
+      <Tab.Screen name={closetName} component={ClosetScreen} />
+      <Tab.Screen name={generateScreen} component={GenerateScreen} />
+      <Tab.Screen name={addName} component={AddStack} />
+      <Tab.Screen name={profileName} component={ProfileScreen} />
+    </Tab.Navigator>
+  );
+};
+
+export default MainTabs;
