@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+const BASE_URL = 'http://Pradys-MacBook-Air.local:8000';
+
 // took from chat gpt
 const SUGGESTIONS = [
   { label: 'Rainy Day', icon: '☔️' },
@@ -28,15 +30,12 @@ const GenerateScreen = ({ navigation }) => {
   const generateOutfit = async () => {
     setLoading(true);
     try {
-      const response = await fetch(
-        'http://192.168.1.212:8000/generate_outfits',
-        {
-          method: 'POST',
-          // later: send prompt in body if you update backend
-          // headers: { 'Content-Type': 'application/json' },
-          // body: JSON.stringify({ prompt }),
-        },
-      );
+      const response = await fetch(`${BASE_URL}/generate_outfits`, {
+        method: 'POST',
+        // later: send prompt in body if you update backend
+        // headers: { 'Content-Type': 'application/json' },
+        // body: JSON.stringify({ prompt }),
+      });
 
       const json = await response.json();
       setOutfits(Array.isArray(json) ? json : []);

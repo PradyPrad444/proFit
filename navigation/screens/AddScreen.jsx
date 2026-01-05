@@ -14,6 +14,8 @@ import returnIcon from '../../assets/return.png';
 import tickIcon from '../../assets/tick.png';
 import { Alert } from 'react-native';
 
+const BASE_URL = 'http://Pradys-MacBook-Air.local:8000';
+
 const AddScreen = ({ navigation }) => {
   const { hasPermission, requestPermission } = useCameraPermission();
   const [cameraInitialized, setCameraInitialized] = React.useState(false);
@@ -49,7 +51,7 @@ const AddScreen = ({ navigation }) => {
   };
 
   const addToWardrobe = async itemId => {
-    const response = await fetch('http://192.168.1.212:8000/wardrobe/add', {
+    const response = await fetch(`${BASE_URL}/wardrobe/add`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ item_id: itemId }),
@@ -80,7 +82,7 @@ const AddScreen = ({ navigation }) => {
         type: 'image/png',
       });
 
-      const response = await fetch('http://192.168.1.212:8000/upload', {
+      const response = await fetch(`${BASE_URL}/upload`, {
         method: 'POST',
         body: data,
         headers: {

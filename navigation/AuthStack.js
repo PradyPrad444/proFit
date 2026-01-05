@@ -2,6 +2,8 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LogInEmailScreen from './screens/LogInEmailScreen';
 import LogInPassScreen from './screens/LogInPassScreen';
+import SignUpEmailScreen from './screens/SignUpEmailScreen';
+import SignUpPassScreen from './screens/SignUpPassScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -14,8 +16,18 @@ const AuthStack = () => {
       ></Stack.Screen>
 
       <Stack.Screen
+        name={'signUpEmailScreen'}
+        component={SignUpEmailScreen}
+      ></Stack.Screen>
+
+      <Stack.Screen
         name={'LogInPassScreen'}
         component={LogInPassScreen}
+      ></Stack.Screen>
+
+      <Stack.Screen
+        name={'SignUpPassScreen'}
+        component={SignUpPassScreen}
       ></Stack.Screen>
     </Stack.Navigator>
   );

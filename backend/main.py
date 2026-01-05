@@ -78,7 +78,7 @@ async def uploadImage(file: UploadFile = File(...)): #the File() it expects a mu
     doc = {
         "item_id" : item_id,
         "file_path" : output_path,
-        "url" : f"http://192.168.1.212:8000/media/{item_id}.png", # public static route to fetch image, later used in frontend
+        "url" : f"http://Pradys-MacBook-Air.local:8000/media/{item_id}.png", # public static route to fetch image, later used in frontend
         "label" : label   
     }
 
@@ -194,4 +194,3 @@ async def generate_outfits():
 async def delete_item(item_id: str):
     result = wardrobeCollection.delete_one({"item_id": item_id})
     return {"deleted": result.deleted_count}
-

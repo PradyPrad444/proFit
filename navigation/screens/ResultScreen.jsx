@@ -11,12 +11,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import returnIcon from '../../assets/return.png';
 import wardrobeIcon from '../../assets/wardrobe.png';
 
+const BASE_URL = 'http://Pradys-MacBook-Air.local:8000';
+
 const ResultScreen = ({ route, navigation }) => {
   const { imageUrl, itemId } = route.params; // saving the base64 image data to imageUrl
 
   // function to add the item into wardrobe
   const addToWardrobe = async itemId => {
-    const response = await fetch('http://192.168.1.212:8000/wardrobe/add', {
+    const response = await fetch(`${BASE_URL}/wardrobe/add`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ item_id: itemId }),

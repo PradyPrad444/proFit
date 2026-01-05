@@ -17,7 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import FIREBASE_AUTH from '../../FirebaseConfig';
 
-const LogInEmailScreen = ({ navigation }) => {
+const SignUpEmailScreen = ({ navigation }) => {
   const [email, setEmail] = React.useState();
 
   const auth = FIREBASE_AUTH;
@@ -30,7 +30,7 @@ const LogInEmailScreen = ({ navigation }) => {
         <View style={styles.content}>
           <View style={styles.credentialContainer}>
             <Text style={styles.enterEmailText}>
-              LogIn using your Email Address
+              Create account using your Email Address
             </Text>
 
             <TextInput
@@ -39,16 +39,6 @@ const LogInEmailScreen = ({ navigation }) => {
               placeholderTextColor="gray"
               onChangeText={setEmail}
             />
-
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate('signUpEmailScreen');
-              }}
-            >
-              <Text style={{ color: 'white', marginTop: 80 }}>
-                Don't have an account? Click one to create
-              </Text>
-            </TouchableOpacity>
           </View>
 
           <View style={styles.bottomContainer}>
@@ -57,9 +47,9 @@ const LogInEmailScreen = ({ navigation }) => {
             </Text>
             <TouchableOpacity
               style={styles.continueButton}
-              onPress={() => navigation.navigate('LogInPassScreen', { email })}
+              onPress={() => navigation.navigate('SignUpPassScreen', { email })}
             >
-              <Text style={styles.logInHeading}>Continue</Text>
+              <Text style={styles.logInHeading}>Sign Up</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -68,7 +58,7 @@ const LogInEmailScreen = ({ navigation }) => {
   );
 };
 
-export default LogInEmailScreen;
+export default SignUpEmailScreen;
 
 const styles = StyleSheet.create({
   safeArea: {

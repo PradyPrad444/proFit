@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import WardrobeRow from '../../components/WardrobeRowAction';
 
-const BASE_URL = 'http://192.168.1.212:8000';
+const BASE_URL = 'http://Pradys-MacBook-Air.local:8000';
 
 const ClosetScreen = () => {
   const [wardrobeItems, setWardrobeItems] = React.useState([]);
@@ -23,7 +23,7 @@ const ClosetScreen = () => {
     React.useCallback(() => {
       const fetchWardrobe = async () => {
         try {
-          const response = await fetch('http://192.168.1.212:8000/wardrobe');
+          const response = await fetch(`${BASE_URL}/wardrobe`);
 
           const json = await response.json();
 

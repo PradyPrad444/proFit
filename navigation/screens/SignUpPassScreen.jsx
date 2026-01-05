@@ -1,26 +1,36 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
-  Image,
-  Alert,
-  FlatList,
-  ActivityIndicator,
-  StyleSheet,
-  Pressable,
   TextInput,
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useFocusEffect } from '@react-navigation/native';
-import FIREBASE_AUTH from '../../FirebaseConfig';
+import auth from '@react-native-firebase/auth';
 
-const LogInEmailScreen = ({ navigation }) => {
-  const [email, setEmail] = React.useState();
+const SignUpPassScreen = ({ route }) => {
+  const { email } = route.params;
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const auth = FIREBASE_AUTH;
+  const signUp = async () => {
+    if (!password) return;
+
+    try {
+      setLoading(true);
+      await auth().createUserWithEmailAndPassword(email, password);
+    } catch (error) {
+      Alert.alert('Sign Up failed', error?.message ?? 'Something went wrong');
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
@@ -29,37 +39,29 @@ const LogInEmailScreen = ({ navigation }) => {
       >
         <View style={styles.content}>
           <View style={styles.credentialContainer}>
-            <Text style={styles.enterEmailText}>
-              LogIn using your Email Address
-            </Text>
+            <Text style={styles.enterEmailText}>Create your Password</Text>
 
             <TextInput
               style={styles.emailTextInput}
               placeholder="enter here"
               placeholderTextColor="gray"
-              onChangeText={setEmail}
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
             />
-
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate('signUpEmailScreen');
-              }}
-            >
-              <Text style={{ color: 'white', marginTop: 80 }}>
-                Don't have an account? Click one to create
-              </Text>
-            </TouchableOpacity>
           </View>
 
           <View style={styles.bottomContainer}>
             <Text style={{ color: 'white', marginBottom: 20 }}>
-              By clicking 'Continue', you agree to our Term of Service
+              By clicking 'Sign Up', you agree to our Terms of Service
             </Text>
+
             <TouchableOpacity
               style={styles.continueButton}
-              onPress={() => navigation.navigate('LogInPassScreen', { email })}
+              onPress={signUp}
+              disabled={loading || !password}
             >
-              <Text style={styles.logInHeading}>Continue</Text>
+              <Text style={styles.logInHeading}>{'Sign Up'}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -68,42 +70,26 @@ const LogInEmailScreen = ({ navigation }) => {
   );
 };
 
-export default LogInEmailScreen;
+export default SignUpPassScreen;
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: 'black',
-  },
-
-  keyboardView: {
-    flex: 1,
-  },
-
+  safeArea: { flex: 1, backgroundColor: 'black' },
+  keyboardView: { flex: 1 },
   content: {
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 20,
     justifyContent: 'space-between',
   },
-
-  credentialContainer: {
-    marginTop: 20,
-  },
-
-  enterEmailText: {
-    color: 'white',
-    fontSize: 26,
-    fontWeight: 'bold',
-  },
-
+  credentialContainer: { marginTop: 20 },
+  enterEmailText: { color: 'white', fontSize: 26, fontWeight: 'bold' },
   emailTextInput: {
     marginTop: 30,
     color: 'white',
     fontSize: 32,
     fontWeight: 'bold',
   },
-
+  bottomContainer: {},
   continueButton: {
     marginBottom: 20,
     backgroundColor: '#2E2A26',
@@ -111,10 +97,5 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
   },
-
-  logInHeading: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: 'white',
-  },
+  logInHeading: { fontSize: 18, fontWeight: '600', color: 'white' },
 });
